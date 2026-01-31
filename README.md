@@ -217,7 +217,19 @@ uv run android-proxy-start
 ### Q: 安装了证书但某些 App 还是抓不到 HTTPS？
 
 - Android 7+ 用户证书默认不被 App 信任 → 需要安装系统证书（参考上方）
-- 部分 App 有 SSL Pinning → 需要使用 Frida/LSPosed 等工具绕过
+- 部分 App 有 SSL Pinning（证书锁定）→ 参考下方绕过方案
+
+### Q: 如何绕过 SSL Pinning？
+
+推荐使用 **LSPosed + 禁用 SSL 验证插件**：
+
+1. 安装 [Magisk](https://github.com/topjohnwu/Magisk)（需要 Root）
+2. 安装 [LSPosed](https://github.com/LSPosed/LSPosed) 模块
+3. 安装以下任一插件：
+   - [TrustMeAlready](https://github.com/ViRb3/TrustMeAlready)
+   - [JustTrustMe](https://github.com/Fuzion24/JustTrustMe)
+4. 在 LSPosed 中启用插件，勾选目标 App
+5. 重启目标 App
 
 ### Q: 响应太大，MCP 无法返回？
 
