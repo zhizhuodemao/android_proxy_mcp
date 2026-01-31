@@ -1,0 +1,45 @@
+[project]
+name = "android-proxy-mcp"
+version = "0.1.0"
+description = "Android headless packet capture MCP service - 基于 MCP 的 Android 无头抓包服务"
+requires-python = ">=3.11"
+dependencies = [
+    "mitmproxy>=10.0.0",
+    "mcp>=1.0.0",
+    "loguru>=0.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.4.0",
+    "requests>=2.31.0",
+]
+
+[project.scripts]
+android-proxy-mcp = "android_proxy_mcp.server:main"
+android-proxy-start = "android_proxy_mcp.cli.start:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/android_proxy_mcp"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = [
+    "requires_device: 需要连接真实 Android 设备",
+    "requires_rooted_device: 需要连接已 root 的 Android 设备",
+    "slow: 标记较慢的测试（如网络请求）",
+]
