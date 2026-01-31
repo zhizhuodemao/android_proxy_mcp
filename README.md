@@ -31,6 +31,19 @@
 - Python 3.11+
 - [uv](https://github.com/astral-sh/uv) (Python 包管理器)
 
+**安装 uv：**
+
+```bash
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# 或通过 pip
+pip install uv
+```
+
 ### 2. 安装
 
 ```bash
