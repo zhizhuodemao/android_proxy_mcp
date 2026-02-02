@@ -16,7 +16,8 @@ def _get_store() -> SQLiteTrafficStore:
 
 
 def traffic_list(
-    limit: int = 50,
+    limit: int = 10,
+    offset: int = 0,
     filter_domain: str | None = None,
     filter_type: str | None = None,
     filter_status: str | None = None,
@@ -26,7 +27,8 @@ def traffic_list(
     列出捕获的流量
 
     Args:
-        limit: 返回数量限制，默认 50
+        limit: 返回数量限制，默认 10，最大 10
+        offset: 跳过前 N 条记录，用于分页（如 offset=10 查看第 11-20 条）
         filter_domain: 按域名筛选（支持通配符，如 *.example.com）
         filter_type: 按资源类型筛选（XHR, Document, Image, Script, etc.）
         filter_status: 按状态码筛选（如 200, 4xx, 500-599）
@@ -46,19 +48,27 @@ def traffic_list(
             "total": 0,
         }
 
+    # 限制最大返回数量为 10
+    limit = min(limit, 10)
+
     records = store.query(
         limit=limit,
+        offset=offset,
         filter_domain=filter_domain,
         filter_type=filter_type,
         filter_status=filter_status,
         filter_url=filter_url,
     )
 
+    store_size = len(store)
+
     return {
         "success": True,
         "requests": [r.to_summary() for r in records],
-        "total": len(records),
-        "store_size": len(store),
+        "returned": len(records),
+        "offset": offset,
+        "store_size": store_size,
+        "has_more": offset + len(records) < store_size,
     }
 
 

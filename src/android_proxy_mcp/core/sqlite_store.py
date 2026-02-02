@@ -134,7 +134,8 @@ class SQLiteTrafficStore:
 
     def query(
         self,
-        limit: int = 50,
+        limit: int = 10,
+        offset: int = 0,
         filter_domain: str | None = None,
         filter_type: str | None = None,
         filter_status: str | None = None,
@@ -144,7 +145,8 @@ class SQLiteTrafficStore:
         查询流量记录
 
         Args:
-            limit: 返回最近的 N 条
+            limit: 返回最近的 N 条，最大 10
+            offset: 跳过前 N 条记录，用于分页
             filter_domain: 按域名筛选，支持通配符
             filter_type: 按资源类型筛选
             filter_status: 按状态码筛选
@@ -153,6 +155,9 @@ class SQLiteTrafficStore:
         Returns:
             匹配的流量记录列表，按时间倒序
         """
+        # 限制最大返回数量为 10
+        limit = min(limit, 10)
+
         conditions = []
         params = []
 
@@ -178,14 +183,14 @@ class SQLiteTrafficStore:
             params.append(f"%{filter_url}%")
 
         where_clause = " AND ".join(conditions) if conditions else "1=1"
-        params.append(limit)
+        params.extend([limit, offset])
 
         with self._get_conn() as conn:
             rows = conn.execute(f"""
                 SELECT * FROM traffic
                 WHERE {where_clause}
                 ORDER BY timestamp DESC
-                LIMIT ?
+                LIMIT ? OFFSET ?
             """, params).fetchall()
 
             return [self._row_to_record(row) for row in rows]

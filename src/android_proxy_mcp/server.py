@@ -50,14 +50,19 @@ async def list_tools() -> list[Tool]:
         # 流量工具
         Tool(
             name="traffic_list",
-            description="列出捕获的 HTTP/HTTPS 流量。支持按域名、类型、状态码、URL 筛选。",
+            description="列出捕获的 HTTP/HTTPS 流量。默认返回最近 10 条，支持分页和筛选。",
             inputSchema={
                 "type": "object",
                 "properties": {
                     "limit": {
                         "type": "integer",
-                        "description": "返回数量限制，默认 50",
-                        "default": 50,
+                        "description": "返回数量限制，默认 10，最大 10",
+                        "default": 10,
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "description": "跳过前 N 条记录，用于分页（如 offset=10 查看第 11-20 条）",
+                        "default": 0,
                     },
                     "filter_domain": {
                         "type": "string",
@@ -237,7 +242,8 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
     # 流量工具
     elif name == "traffic_list":
         result = traffic_list(
-            limit=arguments.get("limit", 50),
+            limit=arguments.get("limit", 10),
+            offset=arguments.get("offset", 0),
             filter_domain=arguments.get("filter_domain"),
             filter_type=arguments.get("filter_type"),
             filter_status=arguments.get("filter_status"),
